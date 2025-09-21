@@ -14,6 +14,10 @@ def home():
 def get_data():
     return jsonify(datas)
 
+@app.route('/api', methods=['GET'])
+def api_page():
+    return jsonify({"message" : "This is API page for team Meow"})
+
 @app.route('/api/data', methods=['POST'])
 def create_data():
     data = request.get_json()

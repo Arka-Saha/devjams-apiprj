@@ -53,7 +53,8 @@ def generate_openapi(fields, datatypes, path="/user", method="post"):
             }
         }
     }
-
+    with open("openai.json", "a+") as f:
+        json.dump(openapi_spec, f)
     return openapi_spec
 
 schema = gen_scheme(fields, types)
