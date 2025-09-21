@@ -1,6 +1,6 @@
 import json, requests
 import jsonschema, time
-
+import statistics
 # fields = list(map(str, input("Fields> ").split(", ")))
 # types = list(map(str, input("Data types> ").split(", ")))
 fields = ["id", "name", "role"]
@@ -56,16 +56,24 @@ def generate_openapi(fields, datatypes, path="/user", method="post"):
 
     return openapi_spec
 
-
-
 schema = gen_scheme(fields, types)
 spec = generate_openapi(fields, types)
 
-start = time.time()
-resp = requests.get(URL)
-latency = (time.time() - start) * 1000 #in ms
+latencies = []
+status_codes = []
+errors = 0
 
+for _ in range(10):
+    start = time.time()
+    try:
+        resp = requests.get(URL, timeout=3)
+        latency = (time.time() - start) * 1000 #in ms
+        status = resp.status_code
+        latencies.append(latency)
+        status_codes.append(status)
+    except:
+        errors+=1
+latency_avg = sum(latencies) / len(latencies)
 print(resp.json())
 jsonschema.validate(instance=resp, schema=schema)
-status = resp.status_code
-print(latency)
+print(latency_avg)
