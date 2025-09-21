@@ -17,7 +17,49 @@ def gen_scheme(fields, types):
     for f, t in zip(fields, types):
         schema["properties"][f] = {"type": t}
     return schema
+
+def generate_openapi(fields, datatypes, path="/user", method="post"):
+    schema = gen_scheme(fields, datatypes)
+
+    openapi_spec = {
+        "openapi": "3.0.0",
+        "info": {
+            "title": "Dynamic API",
+            "version": "1.0.0"
+        },
+        "paths": {
+            path: {
+                method: {
+                    "summary": "Auto-generated endpoint",
+                    "requestBody": {
+                        "required": True,
+                        "content": {
+                            "application/json": {
+                                "schema": schema
+                            }
+                        }
+                    },
+                    "responses": {
+                        "200": {
+                            "description": "Success",
+                            "content": {
+                                "application/json": {
+                                    "schema": schema
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return openapi_spec
+
+
+
 schema = gen_scheme(fields, types)
+spec = generate_openapi(fields, types)
 
 start = time.time()
 resp = requests.get(URL)
